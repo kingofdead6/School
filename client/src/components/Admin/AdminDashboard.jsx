@@ -69,7 +69,11 @@ export default function AdminDashboard() {
       title: "Programs Management",
       description: "Add and edit programs and curriculum",
     },
-    
+    {
+      path: "/admin/testimonials",
+      title: "Testimonials Management",
+      description: "Approve or delete submitted testimonials",
+    }
   ];
 
   const superadminSections = [

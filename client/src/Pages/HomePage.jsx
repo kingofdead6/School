@@ -3,7 +3,7 @@ import ContactForm from '../components/Home/Contact'
 import Hero from '../components/Home/Hero'
 import MainPage from '../components/Home/MainPage'
 import GalleryPage from '../components/Home/GalleryPage'
-
+import Testimonials from '../components/Home/Testimonials'
 
 const HomePage = () => {
   return (
@@ -11,7 +11,8 @@ const HomePage = () => {
       <Hero />
       <MainPage />
       <GalleryPage />
-       <ContactForm />
+      <ContactForm />
+      <Testimonials />
     </div>
   )
 }

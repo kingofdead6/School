@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
-import { FaSearch, FaBook } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaSearch, FaBook, FaTimes } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -38,6 +38,7 @@ const Programs = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null); // 👈 for fullscreen image
   const sliderRef = useRef(null);
 
   useEffect(() => {
@@ -49,8 +50,12 @@ const Programs = () => {
           axios.get(`${API_BASE_URL}/grades`),
         ]);
 
-        const programsData = Array.isArray(programsRes.data) ? programsRes.data : programsRes.data.programs || [];
-        const gradesData = Array.isArray(gradesRes.data) ? gradesRes.data : gradesRes.data.grades || [];
+        const programsData = Array.isArray(programsRes.data)
+          ? programsRes.data
+          : programsRes.data.programs || [];
+        const gradesData = Array.isArray(gradesRes.data)
+          ? gradesRes.data
+          : gradesRes.data.grades || [];
 
         setPrograms(programsData);
         setGrades(gradesData);
@@ -76,7 +81,8 @@ const Programs = () => {
     }
 
     if (selectedGrade) {
-      matchesGrade = program.yearLevel?._id?.toString() === selectedGrade;
+      matchesGrade =
+        program.yearLevel?._id?.toString() === selectedGrade;
     }
 
     return matchesSearch && matchesGrade;
@@ -107,16 +113,12 @@ const Programs = () => {
   }
 
   if (error) {
-    return (
-      <div className="text-center text-red-600 py-10">
-        Error: {error}
-      </div>
-    );
+    return <div className="text-center text-red-600 py-10">Error: {error}</div>;
   }
 
   return (
     <>
-      {/* Header + Filters centered in max container */}
+      {/* Header + Filters */}
       <div className="w-full max-w-7xl mx-auto px-4 py-12 bg-white overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -133,7 +135,6 @@ const Programs = () => {
           </p>
         </motion.div>
 
-        {/* Filter Bar */}
         <div className="bg-red-50 rounded-xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row gap-4">
           <div className="w-full sm:w-1/3">
             <label className="block text-red-700 font-medium mb-2">Year Level</label>
@@ -167,7 +168,7 @@ const Programs = () => {
         </div>
       </div>
 
-      {/* Full-width carousel */}
+      {/* Programs Slider */}
       <div
         style={{
           position: "relative",
@@ -195,7 +196,8 @@ const Programs = () => {
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.25 }}
-                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+                      onClick={() => setSelectedImage(program.image || "https://via.placeholder.com/300x200?text=No+Image")}
                     >
                       <div className="relative">
                         <img
@@ -210,8 +212,6 @@ const Programs = () => {
                           {program.yearLevel?.name || "N/A"}
                         </div>
                       </div>
-
-                     
                     </motion.div>
                   </div>
                 ))}
@@ -220,6 +220,39 @@ const Programs = () => {
           )}
         </div>
       </div>
+
+      {/* Fullscreen Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+          >
+            <motion.div
+              className="relative max-w-5xl w-full p-4"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="cursor-pointer absolute top-4 right-4 text-white text-3xl hover:text-red-500 transition"
+              >
+                <FaTimes />
+              </button>
+              <img
+                src={selectedImage}
+                alt="Program Full"
+                className="w-full max-h-[90vh] object-contain rounded-lg shadow-lg"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -13,7 +13,7 @@ import contactRoutes from './routes/ContactRoute.js';
 import announcementRoutes from './routes/AnnouncementRoute.js';
 import newsletterRoutes from './routes/newslettersRoute.js';
 import programRoutes from './routes/programRoute.js';
-
+import testimonialRoutes from './routes/testimonialRoutes.js'
 dotenv.config();
 
 const app = express();
@@ -33,7 +33,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/programs' , programRoutes);
-
+app.use("/api/testimonials", testimonialRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))

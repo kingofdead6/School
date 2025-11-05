@@ -222,29 +222,7 @@ const TeacherProfile = () => {
                       </div>
                     ))}
                   </Slider>
-
-                  {/* Thumbnails grid (desktop) */}
-                  <div className="hidden md:grid grid-cols-6 gap-3 mt-4">
-                    {gallery.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          if (sliderRef.current) sliderRef.current.slickGoTo(i);
-                          // also open modal optionally:
-                          // setSelectedImage(img.url);
-                        }}
-                        className="overflow-hidden rounded-md border border-gray-200"
-                        aria-label={`Go to image ${i + 1}`}
-                      >
-                        <img
-                          src={img.url}
-                          alt={`thumb-${i}`}
-                          className="w-full h-20 object-cover hover:scale-105 transition-transform duration-200"
-                          onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=No+Image'; }}
-                        />
-                      </button>
-                    ))}
-                  </div>
+       
 
                   {/* mobile thumbnails as horizontal scroll */}
                   <div className="md:hidden flex gap-2 overflow-x-auto mt-4 pb-2">

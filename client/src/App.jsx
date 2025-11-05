@@ -22,6 +22,9 @@ import TeacherProfile from "./components/Teachers/TeacherProfile";
 import TeacherGroups from "./components/Teachers/TeacherGroup";
 import TeacherProfiles from "./components/Home/TeacherProfile";
 import AdminPrograms from "./components/Admin/AdminPrograms";
+import SubmitTestimonialPage from "./components/Home/SubmitTestimonial";
+import AdminTestimonials from "./components/Admin/AdminTestimonials";
+import StudentRegistrationForm from "./components/Registration/StudentRegistrationForm";
 
 
 export default function App() {
@@ -33,8 +36,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/teacher/:id" element={<TeacherProfiles />} />
+          <Route path="/reviews" element={<SubmitTestimonialPage /> } />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/registration" element={<StudentRegistrationForm />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/registrations" element={<AdminRegistration />} />
@@ -48,6 +53,7 @@ export default function App() {
               <Route path="/admin/announcements" element={<AdminAnnouncements />} />
               <Route path="/admin/admins" element={<AdminManagement />} />
               <Route path="/admin/programs" element={<AdminPrograms />} />
+              <Route path="/admin/testimonials" element={<AdminTestimonials />} />
 
               <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
               <Route path="/teacher/profile" element={<TeacherProfile />} />
