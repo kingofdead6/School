@@ -245,7 +245,7 @@ export default function TeacherProfile() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowEditModal(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-red-300 transition"
+                  className="cursor-pointer flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-red-300 transition"
                 >
                   <FaEdit /> Edit Profile
                 </motion.button>
