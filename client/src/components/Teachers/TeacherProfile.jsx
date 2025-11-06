@@ -574,7 +574,7 @@ function EditProfileModal({ user, formData, setFormData, formErrors, loading, su
               whileTap={{ scale: loading ? 1 : 0.95 }}
               type="submit"
               disabled={loading}
-              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+              className={`cursor-pointer flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
                 loading
                   ? "bg-red-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
