@@ -688,7 +688,7 @@ function GalleryModal({ user, galleryFormData, setGalleryFormData, galleryFormEr
                     <button
                       type="button"
                       onClick={() => toggleRemoveImageId(img.publicId)}
-                      className={`absolute top-1 right-1 rounded-full p-1 transition ${
+                      className={`cursor-pointer absolute top-1 right-1 rounded-full p-1 transition ${
                         galleryFormData.removeImageIds.includes(img.publicId)
                           ? 'bg-green-600 text-white'
                           : 'bg-red-600 text-white opacity-0 group-hover:opacity-100'
