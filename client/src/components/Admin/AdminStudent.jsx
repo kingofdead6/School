@@ -358,7 +358,7 @@ export default function AdminStudent() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDetailsClick(student)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition"
+                    className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition"
                   >
                     <FaInfoCircle /> Details
                   </motion.button>
@@ -366,7 +366,7 @@ export default function AdminStudent() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDelete(student._id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow transition"
+                    className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow transition"
                   >
                     <FaTrash /> Delete
                   </motion.button>
@@ -404,7 +404,7 @@ export default function AdminStudent() {
               >
                 <div className="flex justify-between items-center mb-5">
                   <h2 className="text-2xl font-bold text-red-700">Add New Student</h2>
-                  <button onClick={() => setShowModal(false)} disabled={loading} className="text-gray-500 hover:text-red-600">
+                  <button onClick={() => setShowModal(false)} disabled={loading} className="cursor-pointer text-gray-500 hover:text-red-600">
                     <FaTimes size={20} />
                   </button>
                 </div>
@@ -600,7 +600,7 @@ export default function AdminStudent() {
                       whileTap={{ scale: loading ? 1 : 0.95 }}
                       type="submit"
                       disabled={loading}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+                      className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
                         loading
                           ? "bg-red-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"

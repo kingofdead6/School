@@ -163,7 +163,7 @@ export default function AdminPrograms() {
               setForm({ name: "", yearLevel: "", image: null });
               setShowModal(true);
             }}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition"
+            className="cursor-pointer flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition"
           >
             <FaPlus /> Add Program
           </button>
@@ -239,7 +239,7 @@ export default function AdminPrograms() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEdit(program)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
+                        className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
                       >
                         <FaEdit /> Edit
                       </motion.button>
@@ -247,7 +247,7 @@ export default function AdminPrograms() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(program._id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition"
+                        className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition"
                       >
                         <FaTrash /> Delete
                       </motion.button>
@@ -341,7 +341,7 @@ export default function AdminPrograms() {
                       whileTap={{ scale: 0.95 }}
                       type="submit"
                       disabled={loading || grades.length === 0}
-                      className={`bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition ${
+                      className={`cursor-pointer bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition ${
                         loading || grades.length === 0 ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -353,7 +353,7 @@ export default function AdminPrograms() {
                       type="button"
                       onClick={() => setShowModal(false)}
                       disabled={loading}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-2 rounded-lg font-bold transition"
+                      className="cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-2 rounded-lg font-bold transition"
                     >
                       Cancel
                     </motion.button>

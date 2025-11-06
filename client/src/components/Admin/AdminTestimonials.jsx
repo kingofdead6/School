@@ -70,7 +70,7 @@ export default function AdminTestimonials() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 overflow-x-hidden">
+    <div className="min-h-screen bg-white py-12 px-4 overflow-x-hidden mt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -144,7 +144,7 @@ export default function AdminTestimonials() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setModal({ open: true, action: "approve", id: t._id, name: t.name })}
-                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                            className="cursor-pointer bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
                           >
                             Approve
                           </motion.button>
@@ -153,7 +153,7 @@ export default function AdminTestimonials() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setModal({ open: true, action: "delete", id: t._id, name: t.name })}
-                          className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                          className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
                         >
                           <FaTrash />
                         </motion.button>
@@ -183,7 +183,7 @@ export default function AdminTestimonials() {
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => setModal({ open: false, action: "", id: null, name: "" })}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+                  className="cursor-pointer px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
                 >
                   Cancel
                 </button>
@@ -191,7 +191,7 @@ export default function AdminTestimonials() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => (modal.action === "approve" ? handleApprove(modal.id) : handleDelete(modal.id))}
-                  className={`px-4 py-2 rounded-lg text-white ${
+                  className={`cursor-pointer px-4 py-2 rounded-lg text-white ${
                     modal.action === "approve" ? "bg-red-600 hover:bg-red-700" : "bg-gray-600 hover:bg-gray-700"
                   } transition`}
                 >
