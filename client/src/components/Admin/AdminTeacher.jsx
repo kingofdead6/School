@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPlus, FaTrash, FaEdit, FaUsers, FaUser } from "react-icons/fa";
+import { 
+  FaPlus, FaTrash, FaEdit, FaUsers, FaUser, FaTimes, 
+  FaBook, FaGraduationCap, FaCalendarAlt, FaImage, FaCheck, FaTimesCircle  , FaEnvelope
+} from "react-icons/fa";
 import { API_BASE_URL } from "../../../api";
 
 export default function AdminTeachers() {
@@ -43,15 +46,12 @@ export default function AdminTeachers() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found. Please log in.");
       const response = await axios.get(`${API_BASE_URL}/teachers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTeachers(response.data);
-      setError("");
     } catch (err) {
-      console.error("Fetch teachers error:", err);
-      setError(err.response?.data?.message || "Failed to fetch teachers. Please try again.");
+      setError(err.response?.data?.message || "Failed to fetch teachers");
     } finally {
       setLoading(false);
     }
@@ -65,10 +65,8 @@ export default function AdminTeachers() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setGroupsData(response.data);
-      setError("");
     } catch (err) {
-      console.error("Fetch groups error:", err);
-      setError(err.response?.data?.message || "Failed to fetch groups. Please try again.");
+      setError(err.response?.data?.message || "Failed to fetch groups");
     } finally {
       setGroupsLoading(false);
     }
@@ -76,16 +74,18 @@ export default function AdminTeachers() {
 
   const validateForm = (isEdit = false) => {
     const errors = {};
-    if (!formData.fullName) errors.fullName = "Full name is required";
+    if (!formData.fullName.trim()) errors.fullName = "Full name is required";
     else if (formData.fullName.length > 50) errors.fullName = "Name cannot exceed 50 characters";
+
     if (!isEdit) {
-      if (!formData.email) errors.email = "Email is required";
+      if (!formData.email.trim()) errors.email = "Email is required";
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email format";
     } else {
       if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email format";
     }
+
     if (formData.password && formData.password.length < 6) errors.password = "Password must be at least 6 characters";
-    if (!formData.subjectsTaught || formData.subjectsTaught.length === 0) errors.subjectsTaught = "At least one subject is required";
+    if (!formData.subjectsTaught.length) errors.subjectsTaught = "At least one subject is required";
     if (formData.degree && formData.degree.length > 100) errors.degree = "Degree cannot exceed 100 characters";
     if (formData.bio && formData.bio.length > 500) errors.bio = "Bio cannot exceed 500 characters";
     if (formData.photo && !["image/jpeg", "image/png"].includes(formData.photo.type)) {
@@ -117,17 +117,15 @@ export default function AdminTeachers() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(`${API_BASE_URL}/teachers`, form, {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess("Teacher created successfully!");
-      setError("");
+      setTimeout(() => setSuccess(""), 3000);
       setShowAddModal(false);
-      setFormData({ fullName: "", email: "", password: "", subjectsTaught: [], degree: "", bio: "", photo: null, removePhoto: false });
-      setFormErrors({});
+      resetForm();
       fetchTeachers();
     } catch (err) {
-      console.error("Create teacher error:", err);
-      setError(err.response?.data?.message || "Failed to create teacher. Please try again.");
+      setError(err.response?.data?.message || "Failed to create teacher");
     } finally {
       setLoading(false);
     }
@@ -142,7 +140,7 @@ export default function AdminTeachers() {
     setLoading(true);
     const form = new FormData();
     form.append("fullName", formData.fullName);
-    form.append("email", formData.email);
+    if (formData.email) form.append("email", formData.email);
     if (formData.password) form.append("password", formData.password);
     form.append("subjectsTaught", JSON.stringify(formData.subjectsTaught));
     form.append("degree", formData.degree || "");
@@ -152,50 +150,49 @@ export default function AdminTeachers() {
 
     try {
       const token = localStorage.getItem("token");
-      console.log('Updating teacher with ID:', selectedTeacher._id); // Debug log
-      console.log('Form data:', Object.fromEntries(form)); // Debug log
-      console.log('Token:', token); // Debug log
-      const response = await axios.put(`${API_BASE_URL}/teachers/${selectedTeacher._id}`, form, {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+      await axios.put(`${API_BASE_URL}/teachers/${selectedTeacher._id}`, form, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('Update response:', response.data); // Debug log
       setSuccess("Teacher updated successfully!");
-      setError("");
+      setTimeout(() => setSuccess(""), 3000);
       setShowEditModal(false);
       setSelectedTeacher(null);
-      setFormData({ fullName: "", email: "", password: "", subjectsTaught: [], degree: "", bio: "", photo: null, removePhoto: false });
-      setFormErrors({});
+      resetForm();
       fetchTeachers();
     } catch (err) {
-      console.error("Update teacher error:", err);
-      setError(err.response?.data?.message || "Failed to update teacher. Please try again.");
+      setError(err.response?.data?.message || "Failed to update teacher");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this teacher?")) return;
     setDeletingId(id);
     try {
       const token = localStorage.getItem("token");
-      console.log('Deleting teacher with ID:', id); // Debug log
       await axios.delete(`${API_BASE_URL}/teachers/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess("Teacher deleted successfully!");
-      setError("");
+      setTimeout(() => setSuccess(""), 3000);
       setShowGroupsModal(false);
       fetchTeachers();
     } catch (err) {
-      console.error("Delete teacher error:", err);
-      setError(err.response?.data?.message || "Failed to delete teacher. Please try again.");
+      setError(err.response?.data?.message || "Failed to delete teacher");
     } finally {
       setDeletingId(null);
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      fullName: "", email: "", password: "", subjectsTaught: [], degree: "", bio: "", photo: null, removePhoto: false
+    });
+    setFormErrors({});
+  };
+
   const handleEditClick = (teacher) => {
-    console.log('Editing teacher:', teacher); // Debug log
     setSelectedTeacher(teacher);
     setFormData({
       fullName: teacher.fullName,
@@ -211,12 +208,12 @@ export default function AdminTeachers() {
   };
 
   const toggleSubject = (subject) => {
-    setFormData((prev) => {
-      const updatedSubjects = prev.subjectsTaught.includes(subject)
-        ? prev.subjectsTaught.filter((s) => s !== subject)
-        : [...prev.subjectsTaught, subject];
-      return { ...prev, subjectsTaught: updatedSubjects };
-    });
+    setFormData(prev => ({
+      ...prev,
+      subjectsTaught: prev.subjectsTaught.includes(subject)
+        ? prev.subjectsTaught.filter(s => s !== subject)
+        : [...prev.subjectsTaught, subject]
+    }));
   };
 
   const handleGroupsClick = (teacher) => {
@@ -225,129 +222,157 @@ export default function AdminTeachers() {
     setShowGroupsModal(true);
   };
 
-  const filteredTeachers = teachers.filter(
-    (teacher) =>
-      (teacher.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       teacher.email.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (filterSubject ? teacher.subjectsTaught.includes(filterSubject) : true)
+  const filteredTeachers = teachers.filter(t =>
+    (t.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     t.email.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (filterSubject ? t.subjectsTaught.includes(filterSubject) : true)
   );
 
   return (
-    <div className="min-h-screen bg-black text-white py-12 px-4 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 py-12 px-4 pt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto"
       >
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-red-600">Teachers Management</h1>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <motion.h1
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 120 }}
+            className="text-3xl md:text-4xl font-extrabold text-red-600 flex items-center gap-3"
+          >
+            <FaUsers className="text-red-700" />
+            Teachers Management
+          </motion.h1>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition"
+            className="cursor-pointer flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-red-300 transition"
           >
             <FaPlus /> Add Teacher
           </motion.button>
         </div>
 
-        {error && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-400 text-center mb-6 font-medium bg-red-900/20 p-3 rounded-lg"
-          >
-            {error}
-          </motion.p>
-        )}
-        {success && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-green-400 text-center mb-6 font-medium bg-green-900/20 p-3 rounded-lg"
-          >
-            {success}
-          </motion.p>
-        )}
+        {/* Messages */}
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-red-600 text-center mb-6 font-medium bg-red-50 p-3 rounded-lg border border-red-200"
+            >
+              {error}
+            </motion.p>
+          )}
+          {success && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-green-600 text-center mb-6 font-medium bg-green-50 p-3 rounded-lg border border-green-200"
+            >
+              {success}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="relative w-full sm:w-1/2">
+        {/* Filters */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8 flex flex-col md:flex-row gap-4"
+        >
+          <div className="relative flex-1 max-w-md">
             <input
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-3 pl-10 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition"
+              className="w-full p-4 pl-12 rounded-xl bg-white border-2 border-red-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-red-500 transition"
             />
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
-              <FaUsers />
-            </div>
+            <FaUsers className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500" size={20} />
           </div>
           <select
             value={filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
-            className="w-full sm:w-1/4 p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition"
+            className="w-full md:w-64 p-4 rounded-xl bg-white border-2 border-red-200 text-gray-800 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-red-500 transition"
           >
             <option value="">All Subjects</option>
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>{subject}</option>
-            ))}
+            {subjects.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-        </div>
+        </motion.div>
 
+        {/* Teacher Cards */}
         {loading ? (
-          <p className="text-center text-gray-400 animate-pulse">Loading...</p>
+          <div className="flex justify-center py-16">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+              className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full"
+            />
+          </div>
         ) : filteredTeachers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTeachers.map((teacher, i) => (
               <motion.div
                 key={teacher._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="bg-gray-900 p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer"
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                className="group bg-white/90 backdrop-blur-sm border border-red-100 rounded-2xl shadow-lg hover:shadow-2xl hover:border-red-300 transition-all duration-300 p-6 cursor-pointer"
                 onClick={() => handleGroupsClick(teacher)}
               >
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-4 mb-4">
                   {teacher.photo?.url ? (
                     <img
                       src={teacher.photo.url}
                       alt={teacher.fullName}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-16 h-16 rounded-full object-cover ring-4 ring-red-100"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
-                      <FaUsers />
+                    <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-600 ring-4 ring-red-200">
+                      <FaUser size={28} />
                     </div>
                   )}
-                  <div>
-                    <h2 className="text-xl font-semibold text-red-600">{teacher.fullName}</h2>
-                    <p className="text-gray-300">{teacher.email}</p>
-                    <p className="text-gray-400 text-sm">{teacher.subjectsTaught?.join(", ") || "-"}</p>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-red-700 line-clamp-1">{teacher.fullName}</h3>
+                    <p className="text-sm text-gray-600">{teacher.email}</p>
                   </div>
                 </div>
-                <div className="mt-4 flex justify-between">
+
+                <div className="space-y-2 text-sm text-gray-700 mb-4">
+                  <p className="flex items-center gap-2">
+                    <FaBook className="text-red-500" /> {teacher.subjectsTaught?.join(", ") || "None"}
+                  </p>
+                  {teacher.degree && (
+                    <p className="flex items-center gap-2">
+                      <FaGraduationCap className="text-red-500" /> {teacher.degree}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditClick(teacher);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(teacher); }}
+                    className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition"
                   >
                     <FaEdit /> Edit
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(teacher._id);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(teacher._id); }}
                     disabled={deletingId === teacher._id}
-                    className={`flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition ${
+                    className={`cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow transition ${
                       deletingId === teacher._id ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
@@ -358,409 +383,350 @@ export default function AdminTeachers() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-200 mt-10 bg-gray-800 p-4 rounded-lg">No teachers found</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-gray-600 mt-16 text-lg"
+          >
+            No teachers found
+          </motion.p>
         )}
 
-        {/* Add Teacher Modal */}
+        {/* Add/Edit Modal */}
         <AnimatePresence>
-          {showAddModal && (
-            <motion.div
-              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div
-                initial={{ scale: 0.9, y: 50 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 50 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-red-600/50"
-              >
-                <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">Add New Teacher</h2>
-                <form onSubmit={handleAddSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.fullName ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.fullName && <p className="text-red-400 text-sm mt-1">{formErrors.fullName}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.email ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Password</label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.password ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.password && <p className="text-red-400 text-sm mt-1">{formErrors.password}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Subjects Taught</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {subjects.map((subject) => (
-                        <label key={subject} className="flex items-center gap-2 text-gray-200">
-                          <input
-                            type="checkbox"
-                            checked={formData.subjectsTaught.includes(subject)}
-                            onChange={() => toggleSubject(subject)}
-                            className="h-5 w-5 text-red-600 focus:ring-red-600 rounded"
-                            disabled={loading}
-                          />
-                          {subject}
-                        </label>
-                      ))}
-                    </div>
-                    {formErrors.subjectsTaught && <p className="text-red-400 text-sm mt-1">{formErrors.subjectsTaught}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Degree (Optional)</label>
-                    <input
-                      type="text"
-                      value={formData.degree}
-                      onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-                      disabled={loading}
-                    />
-                    {formErrors.degree && <p className="text-red-400 text-sm mt-1">{formErrors.degree}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Bio (Optional)</label>
-                    <textarea
-                      value={formData.bio}
-                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                      rows="5"
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white resize-none focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-                      disabled={loading}
-                    />
-                    {formErrors.bio && <p className="text-red-400 text-sm mt-1">{formErrors.bio}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Photo (Optional)</label>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png"
-                      onChange={(e) => setFormData({ ...formData, photo: e.target.files[0], removePhoto: false })}
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white file:bg-red-600 file:text-white file:border-none file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-red-700 transition"
-                      disabled={loading}
-                    />
-                    {formErrors.photo && <p className="text-red-400 text-sm mt-1">{formErrors.photo}</p>}
-                  </div>
-                  <div className="flex justify-between gap-4 mt-8">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type="submit"
-                      disabled={loading}
-                      className={`flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {loading ? "Creating..." : "Create Teacher"}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type="button"
-                      onClick={() => setShowAddModal(false)}
-                      disabled={loading}
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-                    >
-                      Cancel
-                    </motion.button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Edit Teacher Modal */}
-        <AnimatePresence>
-          {showEditModal && selectedTeacher && (
-            <motion.div
-              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div
-                initial={{ scale: 0.9, y: 50 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 50 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-red-600/50"
-              >
-                <div className="relative mb-6">
-                  {selectedTeacher.photo?.url && !formData.removePhoto ? (
-                    <motion.img
-                      src={selectedTeacher.photo.url}
-                      alt={selectedTeacher.fullName}
-                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg mx-auto"
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                    />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 border-4 border-white shadow-lg mx-auto">
-                      <FaUser size={36} />
-                    </div>
-                  )}
-                  <h2 className="text-3xl font-bold text-red-600 text-center mt-4">Edit Teacher</h2>
-                </div>
-                <form onSubmit={handleEditSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.fullName ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.fullName && <p className="text-red-400 text-sm mt-1">{formErrors.fullName}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.email ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Password (leave blank to keep current)</label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className={`w-full p-3 rounded-lg bg-gray-800 border ${
-                        formErrors.password ? "border-red-500" : "border-gray-600"
-                      } text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition`}
-                      disabled={loading}
-                    />
-                    {formErrors.password && <p className="text-red-400 text-sm mt-1">{formErrors.password}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Subjects Taught</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {subjects.map((subject) => (
-                        <label key={subject} className="flex items-center gap-2 text-gray-200">
-                          <input
-                            type="checkbox"
-                            checked={formData.subjectsTaught.includes(subject)}
-                            onChange={() => toggleSubject(subject)}
-                            className="h-5 w-5 text-red-600 focus:ring-red-600 rounded"
-                            disabled={loading}
-                          />
-                          {subject}
-                        </label>
-                      ))}
-                    </div>
-                    {formErrors.subjectsTaught && <p className="text-red-400 text-sm mt-1">{formErrors.subjectsTaught}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Degree</label>
-                    <input
-                      type="text"
-                      value={formData.degree}
-                      onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition"
-                      disabled={loading}
-                    />
-                    {formErrors.degree && <p className="text-red-400 text-sm mt-1">{formErrors.degree}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Bio</label>
-                    <textarea
-                      value={formData.bio}
-                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                      rows="5"
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 transition resize-none"
-                      disabled={loading}
-                    />
-                    {formErrors.bio && <p className="text-red-400 text-sm mt-1">{formErrors.bio}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-gray-200 font-medium mb-2">Photo</label>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png"
-                      onChange={(e) => setFormData({ ...formData, photo: e.target.files[0], removePhoto: false })}
-                      className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white file:bg-red-600 file:text-white file:border-none file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-red-700 transition"
-                      disabled={loading}
-                    />
-                    {formErrors.photo && <p className="text-red-400 text-sm mt-1">{formErrors.photo}</p>}
-                    {selectedTeacher.photo?.url && (
-                      <div className="mt-4 flex items-center gap-4">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, photo: null, removePhoto: true })}
-                          className="flex items-center gap-2 text-red-400 hover:text-red-300 font-medium"
-                          disabled={loading}
-                        >
-                          <FaTrash /> Remove Photo
-                        </motion.button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex justify-between gap-4 mt-8">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type="submit"
-                      disabled={loading}
-                      className={`flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {loading ? "Updating..." : "Update Teacher"}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      type="button"
-                      onClick={() => {
-                        setShowEditModal(false);
-                        setSelectedTeacher(null);
-                      }}
-                      disabled={loading}
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-                    >
-                      Cancel
-                    </motion.button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
+          {(showAddModal || (showEditModal && selectedTeacher)) && (
+            <Modal
+              isEdit={showEditModal}
+              teacher={selectedTeacher}
+              formData={formData}
+              setFormData={setFormData}
+              formErrors={formErrors}
+              loading={loading}
+              onSubmit={showAddModal ? handleAddSubmit : handleEditSubmit}
+              onClose={() => {
+                setShowAddModal(false);
+                setShowEditModal(false);
+                setSelectedTeacher(null);
+                resetForm();
+              }}
+              toggleSubject={toggleSubject}
+              subjects={subjects}
+            />
           )}
         </AnimatePresence>
 
         {/* Groups Modal */}
         <AnimatePresence>
           {showGroupsModal && selectedTeacher && (
-            <motion.div
-              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div
-                initial={{ scale: 0.9, y: 50 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 50 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-red-600/50"
-              >
-                <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">
-                  Groups for {selectedTeacher.fullName}
-                </h2>
-                {error && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-red-400 text-center mb-6 font-medium bg-red-900/20 p-3 rounded-lg"
-                  >
-                    {error}
-                  </motion.p>
-                )}
-                {groupsLoading ? (
-                  <p className="text-center text-gray-400 animate-pulse">Loading...</p>
-                ) : groupsData.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full table-auto">
-                      <thead>
-                        <tr className="bg-red-600/20 text-red-600">
-                          <th className="px-4 py-3 text-left font-semibold">Group Name</th>
-                          <th className="px-4 py-3 text-left font-semibold">Subject</th>
-                          <th className="px-4 py-3 text-left font-semibold">Grade</th>
-                          <th className="px-4 py-3 text-left font-semibold">Schedule</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {groupsData.map((group, i) => (
-                          <motion.tr
-                            key={group._id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: i * 0.05 }}
-                            className="border-b border-gray-800"
-                          >
-                            <td className="px-4 py-3 text-gray-300">{group.name}</td>
-                            <td className="px-4 py-3 text-gray-300">{group.subject}</td>
-                            <td className="px-4 py-3 text-gray-300">{group.grade?.name || "N/A"}</td>
-                            <td className="px-4 py-3 text-gray-300">
-                              {group.schedule.day} {group.schedule.startingtime} - {group.schedule.endingtime}
-                            </td>
-                          </motion.tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-gray-200 text-center">No groups assigned</p>
-                )}
-                <div className="flex justify-between gap-4 mt-8">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleDelete(selectedTeacher._id)}
-                    disabled={deletingId === selectedTeacher._id}
-                    className={`flex items-center gap-2 flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all ${
-                      deletingId === selectedTeacher._id ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    <FaTrash /> {deletingId === selectedTeacher._id ? "Deleting..." : "Delete Teacher"}
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowGroupsModal(false)}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-                  >
-                    Close
-                  </motion.button>
-                </div>
-              </motion.div>
-            </motion.div>
+            <GroupsModal
+              teacher={selectedTeacher}
+              groups={groupsData}
+              loading={groupsLoading}
+              deleting={deletingId === selectedTeacher._id}
+              onDelete={() => handleDelete(selectedTeacher._id)}
+              onClose={() => setShowGroupsModal(false)}
+            />
           )}
         </AnimatePresence>
       </motion.div>
+
+      <style jsx>{`
+        @keyframes shake { 0%,100%{transform:translateX(0)} 10%,30%,50%,70%,90%{transform:translateX(-4px)} 20%,40%,60%,80%{transform:translateX(4px)} }
+        .shake { animation: shake 0.5s ease-in-out; }
+        .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+      `}</style>
     </div>
+  );
+}
+
+// Reusable Modal Component
+function Modal({ isEdit, teacher, formData, setFormData, formErrors, loading, onSubmit, onClose, toggleSubject, subjects }) {
+  return (
+    <motion.div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border border-red-100"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-2xl font-bold text-red-700">
+            {isEdit ? "Edit Teacher" : "Add New Teacher"}
+          </h2>
+          <button onClick={onClose} disabled={loading} className="cursor-pointer text-gray-500 hover:text-red-600">
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        {isEdit && teacher?.photo?.url && !formData.removePhoto && (
+          <div className="flex justify-center mb-4">
+            <img src={teacher.photo.url} alt={teacher.fullName} className="w-24 h-24 rounded-full object-cover ring-4 ring-red-100" />
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          {/* Full Name */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Full Name</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                className={`w-full p-3 pl-11 rounded-xl bg-white border-2 text-gray-800 placeholder-gray-500 transition-all focus:outline-none focus:ring-4 focus:ring-red-100 ${
+                  formErrors.fullName ? "border-red-500 shake" : "border-red-200 focus:border-red-500"
+                }`}
+                placeholder="Enter full name"
+                disabled={loading}
+              />
+              <FaUser className="absolute left-3.5 top-3.5 text-red-500" size={20} />
+            </div>
+            {formErrors.fullName && <p className="text-red-600 text-sm mt-1">{formErrors.fullName}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Email {isEdit && "(Optional)"}</label>
+            <div className="relative">
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className={`w-full p-3 pl-11 rounded-xl bg-white border-2 text-gray-800 placeholder-gray-500 transition-all focus:outline-none focus:ring-4 focus:ring-red-100 ${
+                  formErrors.email ? "border-red-500 shake" : "border-red-200 focus:border-red-500"
+                }`}
+                placeholder="Enter email"
+                disabled={loading}
+              />
+              <FaEnvelope className="absolute left-3.5 top-3.5 text-red-500" size={20} />
+            </div>
+            {formErrors.email && <p className="text-red-600 text-sm mt-1">{formErrors.email}</p>}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">
+              {isEdit ? "New Password (Optional)" : "Password"}
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className={`w-full p-3 rounded-xl bg-white border-2 text-gray-800 placeholder-gray-500 transition-all focus:outline-none focus:ring-4 focus:ring-red-100 ${
+                formErrors.password ? "border-red-500 shake" : "border-red-200 focus:border-red-500"
+              }`}
+              placeholder={isEdit ? "Leave blank to keep current" : "Enter password"}
+              disabled={loading}
+            />
+            {formErrors.password && <p className="text-red-600 text-sm mt-1">{formErrors.password}</p>}
+          </div>
+
+          {/* Subjects */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Subjects Taught</label>
+            <div className="grid grid-cols-2 gap-3">
+              {subjects.map(subject => (
+                <label key={subject} className="flex items-center gap-2 text-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.subjectsTaught.includes(subject)}
+                    onChange={() => toggleSubject(subject)}
+                    className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
+                    disabled={loading}
+                  />
+                  <span className="select-none">{subject}</span>
+                </label>
+              ))}
+            </div>
+            {formErrors.subjectsTaught && <p className="text-red-600 text-sm mt-1">{formErrors.subjectsTaught}</p>}
+          </div>
+
+          {/* Degree */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Degree (Optional)</label>
+            <input
+              type="text"
+              value={formData.degree}
+              onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
+              className="w-full p-3 rounded-xl bg-white border-2 border-red-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-red-500 transition"
+              placeholder="e.g. Master's in Physics"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Bio (Optional)</label>
+            <textarea
+              value={formData.bio}
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              rows="4"
+              className="w-full p-3 rounded-xl bg-white border-2 border-red-200 text-gray-800 placeholder-gray-500 resize-none focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-red-500 transition"
+              placeholder="Short bio..."
+              disabled={loading}
+            />
+          </div>
+
+          {/* Photo */}
+          <div>
+            <label className="block text-red-700 font-semibold mb-2">Photo (Optional)</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png"
+              onChange={(e) => setFormData({ ...formData, photo: e.target.files[0], removePhoto: false })}
+              className="w-full p-3 rounded-xl bg-white border-2 border-red-200 text-gray-800 file:bg-red-600 file:text-white file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-red-700 transition"
+              disabled={loading}
+            />
+            {formErrors.photo && <p className="text-red-600 text-sm mt-1">{formErrors.photo}</p>}
+            {isEdit && teacher?.photo?.url && !formData.removePhoto && (
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setFormData({ ...formData, photo: null, removePhoto: true })}
+                className="cursor-pointer mt-2 flex items-center gap-2 text-red-600 hover:text-red-700"
+                disabled={loading}
+              >
+                <FaTrash /> Remove Current Photo
+              </motion.button>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 justify-end pt-4">
+            <motion.button
+              whileHover={{ scale: loading ? 1 : 1.05 }}
+              whileTap={{ scale: loading ? 1 : 0.95 }}
+              type="submit"
+              disabled={loading}
+              className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+                loading
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
+              }`}
+            >
+              {loading ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                  />
+                  {isEdit ? "Updating..." : "Creating..."}
+                </>
+              ) : (
+                <>
+                  {isEdit ? <FaEdit /> : <FaPlus />} {isEdit ? "Update" : " Add"} Teacher
+                </>
+              )}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="cursor-pointer px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
+            >
+              Cancel
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Groups Modal
+function GroupsModal({ teacher, groups, loading, deleting, onDelete, onClose }) {
+  return (
+    <motion.div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+        className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 border border-red-100"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-2xl font-bold text-red-700">Groups for {teacher.fullName}</h2>
+          <button onClick={onClose} className="cursor-pointer text-gray-500 hover:text-red-600">
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+              className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full"
+            />
+          </div>
+        ) : groups.length > 0 ? (
+          <div className="space-y-3">
+            {groups.map((g, i) => (
+              <motion.div
+                key={g._id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between"
+              >
+                <div>
+                  <h4 className="font-bold text-red-700">{g.name}</h4>
+                  <p className="text-sm text-gray-700">
+                    <FaBook className="inline mr-1" /> {g.subject} | 
+                    <FaGraduationCap className="inline ml-2 mr-1" /> {g.grade?.name || "N/A"}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    <FaCalendarAlt className="inline mr-1" /> {g.schedule.day} {g.schedule.startingtime} - {g.schedule.endingtime}
+                  </p>
+                </div>
+                <FaCheck className="text-green-600" size={20} />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600 py-8">No groups assigned</p>
+        )}
+
+        <div className="flex gap-3 mt-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onDelete}
+            disabled={deleting}
+            className={`cursor-pointer flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all ${
+              deleting ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+            }`}
+          >
+            <FaTrash /> {deleting ? "Deleting..." : "Delete Teacher"}
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onClose}
+            className="cursor-pointer flex-1 px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
+          >
+            Close
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
