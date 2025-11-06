@@ -1,5 +1,5 @@
 import express from 'express';
-import { getGrades, addGrade, deleteGrade, getStudentsByGrade, getGroupsByGrade } from '../controllers/GradeController.js';
+import { getGrades, addGrade, deleteGrade, getStudentsByGrade, getGroupsByGrade } from '../controllers/gradeController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
