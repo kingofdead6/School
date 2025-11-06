@@ -26,6 +26,7 @@ import SubmitTestimonialPage from "./components/Home/SubmitTestimonial";
 import AdminTestimonials from "./components/Admin/AdminTestimonials";
 import StudentRegistrationForm from "./components/Registration/StudentRegistrationForm";
 import Navbar from "./components/Shared/Navbar";
+import NotFound from "./components/Shared/NotFound";
 
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/about-us" element={<AboutPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<StudentRegistrationForm />} />
+          <Route path="*" element={<NotFound />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/registrations" element={<AdminRegistration />} />
