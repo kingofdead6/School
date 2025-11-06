@@ -15,3 +15,26 @@ body {
 .slick-track {
   margin-left: 0 !important;
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; 
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: red; 
+  border-radius: 10px; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cc0000; 
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: red #f1f1f1;
+}
