@@ -20,14 +20,16 @@ import {
   FaCommentDots,
   FaQuoteLeft,
   FaUserCog,
+  FaUserCircle,
+  FaClipboardList,
 } from "react-icons/fa";
-import {jwtDecode} from "jwt-decode";
-
+import { jwtDecode } from "jwt-decode";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [location.pathname]);
 
-  // Scroll behavior: hide on scroll down, show on scroll up
+  // Scroll behavior
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -51,26 +53,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Check auth and role
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded.role === "superadmin" || decoded.role === "admin") {
-          setUserRole(decoded.role);
-        } else {
-          setUserRole(null);
-        }
-      } catch {
-        setUserRole(null);
-      }
-    } else {
-      setUserRole(null);
-    }
-  }, []);
-
-  // Logo pulse animation
+  // Logo pulse
   useEffect(() => {
     if (logoRef.current) {
       gsap.to(logoRef.current, {
@@ -83,14 +66,42 @@ export default function Navbar() {
     }
   }, []);
 
+  // === AUTH STATE MANAGEMENT ===
+  const updateAuth = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserRole(decoded.role || null);
+        setUserName(decoded.fullName || decoded.email?.split("@")[0] || "User");
+      } catch (err) {
+        console.error("Invalid token:", err);
+        setUserRole(null);
+        setUserName("");
+        localStorage.removeItem("token");
+      }
+    } else {
+      setUserRole(null);
+      setUserName("");
+    }
+  };
+
+  // Run on mount + on auth change
+  useEffect(() => {
+    updateAuth(); // On load
+    const handleAuthChange = () => updateAuth();
+    window.addEventListener("authChanged", handleAuthChange);
+    return () => window.removeEventListener("authChanged", handleAuthChange);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUserRole(null);
+    window.dispatchEvent(new Event("authChanged"));
     setMenuOpen(false);
     navigate("/login");
   };
 
-  // Navigation Items
+  // === NAVIGATION ITEMS ===
   const publicNav = [
     { label: "Home", path: "/", icon: <FaHome /> },
     { label: "About Us", path: "/about-us", icon: <FaInfoCircle /> },
@@ -98,7 +109,7 @@ export default function Navbar() {
   ];
 
   const adminNav = [
-    { label: "Dashboard", path: "/admin", icon: <FaUserShield /> },
+    { label: "Dashboard", path: "/admin/dashboard", icon: <FaUserShield /> },
     { label: "Registrations", path: "/admin/registrations", icon: <FaUserGraduate /> },
     { label: "Students", path: "/admin/students", icon: <FaUsers /> },
     { label: "Teachers", path: "/admin/teachers", icon: <FaChalkboardTeacher /> },
@@ -117,12 +128,24 @@ export default function Navbar() {
     { label: "Admins", path: "/admin/admins", icon: <FaUserCog /> },
   ];
 
-  const navItems = userRole === "superadmin" ? superadminNav : userRole === "admin" ? adminNav : publicNav;
+  const teacherNav = [
+    { label: "Dashboard", path: "/teacher/dashboard", icon: <FaChalkboardTeacher /> },
+    { label: "Profile", path: "/teacher/profile", icon: <FaUserCircle /> },
+    { label: "Groups", path: "/teacher/groups", icon: <FaClipboardList /> },
+  ];
+
+  const navItems = userRole === "superadmin"
+    ? superadminNav
+    : userRole === "admin"
+    ? adminNav
+    : userRole === "teacher"
+    ? teacherNav
+    : publicNav;
 
   const renderNavItems = (items) =>
     items.map((item, index) => (
       <motion.li
-        key={index}
+        key={`${item.path}-${index}`}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         className="flex items-center gap-2"
@@ -131,7 +154,7 @@ export default function Navbar() {
           to={item.path}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium ${
             location.pathname === item.path
-              ? "bg-red-600 text-white"
+              ? "bg-red-600 text-white shadow-md"
               : "text-gray-700 hover:bg-red-50 hover:text-red-600"
           }`}
         >
@@ -157,10 +180,12 @@ export default function Navbar() {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center gap-3"
+          className="flex items-center gap-3 ml-5"
         >
           <Link to="/" className="flex items-center gap-3">
-           
+            <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-lg">E</span>
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight">
               <span className="text-red-600">Edu</span>
               <span className="text-gray-800">Center</span>
@@ -171,11 +196,11 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-2">
           <ul className="flex gap-1">
-            {renderNavItems(navItems.slice(0, userRole ? 6 : 3))}
+            {renderNavItems(navItems.slice(0, userRole ? 5 : 3))}
           </ul>
 
-          {/* Show More (Admin) */}
-          {userRole && navItems.length > 6 && (
+          {/* More Dropdown */}
+          {userRole && navItems.length > 5 && (
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="relative group"
@@ -185,7 +210,7 @@ export default function Navbar() {
               </button>
               <div className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-xl border border-red-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 min-w-max">
                 <ul className="py-2">
-                  {navItems.slice(6).map((item, index) => (
+                  {navItems.slice(5).map((item, index) => (
                     <li key={index}>
                       <Link
                         to={item.path}
@@ -201,21 +226,24 @@ export default function Navbar() {
             </motion.div>
           )}
 
-          {/* Logout Button */}
+          {/* User + Logout */}
           {userRole && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleLogout}
-              className="ml-4 px-5 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition flex items-center gap-2 shadow-md"
-            >
-              <FaSignOutAlt />
-              Logout
-            </motion.button>
+            <div className="ml-4 flex items-center gap-3">
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleLogout}
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition flex items-center gap-2 shadow-md"
+              >
+                <FaSignOutAlt />
+                Logout
+              </motion.button>
+            </div>
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Toggle */}
         <motion.button
           whileTap={{ scale: 0.9 }}
           className="lg:hidden text-2xl text-red-600"
@@ -234,15 +262,24 @@ export default function Navbar() {
       >
         <ul className="py-4 px-6 space-y-2">
           {renderNavItems(navItems)}
+
           {userRole && (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={handleLogout}
-              className="w-full mt-4 px-5 py-3 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-            >
-              <FaSignOutAlt />
-              Logout
-            </motion.button>
+            <div className="pt-4 border-t border-red-100">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <FaUserCircle className="text-red-600" />
+                  <span className="font-bold text-red-700 capitalize">{userName}</span>
+                </div>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={handleLogout}
+                className="w-full px-5 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold hover:from-red-700 hover:to-red-800 transition flex items-center justify-center gap-2 shadow-md"
+              >
+                <FaSignOutAlt />
+                Logout
+              </motion.button>
+            </div>
           )}
         </ul>
       </motion.div>
