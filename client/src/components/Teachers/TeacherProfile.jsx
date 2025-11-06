@@ -630,7 +630,7 @@ function GalleryModal({ user, galleryFormData, setGalleryFormData, galleryFormEr
         <div className="p-6 border-b border-red-100">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-red-700">Manage Gallery</h2>
-            <button onClick={onClose} disabled={loading} className="text-gray-500 hover:text-red-600">
+            <button onClick={onClose} disabled={loading} className="cursor-pointer text-gray-500 hover:text-red-600">
               <FaTimes size={20} />
             </button>
           </div>
