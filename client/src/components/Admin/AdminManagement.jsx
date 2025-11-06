@@ -177,7 +177,7 @@ export default function AdminManagement() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-red-300 transition"
+            className="cursor-pointer flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-red-300 transition"
           >
             <FaPlus /> Add Admin
           </motion.button>
@@ -261,7 +261,7 @@ export default function AdminManagement() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openEditModal(admin)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition"
+                    className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow transition"
                   >
                     <FaEdit /> Edit
                   </motion.button>
@@ -269,7 +269,7 @@ export default function AdminManagement() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleDelete(admin._id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow transition"
+                    className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow transition"
                   >
                     <FaTrash /> Delete
                   </motion.button>
@@ -307,7 +307,7 @@ export default function AdminManagement() {
               >
                 <div className="flex justify-between items-center mb-5">
                   <h2 className="text-2xl font-bold text-red-700">Add New Admin</h2>
-                  <button onClick={() => setShowAddModal(false)} disabled={loading} className="text-gray-500 hover:text-red-600">
+                  <button onClick={() => setShowAddModal(false)} disabled={loading} className="cursor-pointer text-gray-500 hover:text-red-600">
                     <FaTimes size={20} />
                   </button>
                 </div>
@@ -367,7 +367,7 @@ export default function AdminManagement() {
                       whileTap={{ scale: loading ? 1 : 0.95 }}
                       type="submit"
                       disabled={loading}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+                      className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
                         loading
                           ? "bg-red-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
@@ -394,7 +394,7 @@ export default function AdminManagement() {
                       type="button"
                       onClick={() => setShowAddModal(false)}
                       disabled={loading}
-                      className="px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
+                      className="cursor-pointer px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
                     >
                       Cancel
                     </motion.button>
@@ -425,7 +425,7 @@ export default function AdminManagement() {
               >
                 <div className="flex justify-between items-center mb-5">
                   <h2 className="text-2xl font-bold text-red-700">Edit Admin</h2>
-                  <button onClick={() => setShowEditModal(false)} disabled={loading} className="text-gray-500 hover:text-red-600">
+                  <button onClick={() => setShowEditModal(false)} disabled={loading} className="cursor-pointer text-gray-500 hover:text-red-600">
                     <FaTimes size={20} />
                   </button>
                 </div>
@@ -465,7 +465,7 @@ export default function AdminManagement() {
                       whileTap={{ scale: loading ? 1 : 0.95 }}
                       type="submit"
                       disabled={loading}
-                      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
+                      className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
                         loading
                           ? "bg-red-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
@@ -492,7 +492,7 @@ export default function AdminManagement() {
                       type="button"
                       onClick={() => setShowEditModal(false)}
                       disabled={loading}
-                      className="px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
+                      className="cursor-pointer px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
                     >
                       Cancel
                     </motion.button>
