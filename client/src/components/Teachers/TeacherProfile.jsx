@@ -559,7 +559,7 @@ function EditProfileModal({ user, formData, setFormData, formErrors, loading, su
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={() => setFormData({ ...formData, removePhoto: true })}
-                className="mt-2 text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                className="cursor-pointer mt-2 text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
                 disabled={loading}
               >
                 <FaTrash /> Remove Current Photo
