@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatePresence,motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -64,18 +64,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-zinc-900 via-black to-zinc-900">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-red-50 via-white to-red-50 py-12">
       <motion.div
         initial={{ y: 30, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
-        className="w-full max-w-md bg-zinc-900/95 backdrop-blur-xl border border-red-800/50 rounded-2xl p-8 shadow-2xl shadow-red-900/20"
+        className="w-full max-w-md bg-white/90 backdrop-blur-sm border border-red-100 rounded-2xl p-8 shadow-xl"
       >
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <motion.div
             whileHover={{ scale: 1.1 }}
-            className="w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-red-700 p-1 shadow-lg shadow-red-600/50"
+            className="w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-red-700 p-1 shadow-lg shadow-red-300"
           >
             <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
               <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-2xl">
@@ -87,8 +87,8 @@ export default function Login() {
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-          <p className="mt-2 text-sm text-gray-400">Sign in to your account</p>
+          <h1 className="text-3xl font-bold text-red-700">Welcome Back</h1>
+          <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
         </div>
 
         {/* Form Error */}
@@ -98,7 +98,7 @@ export default function Login() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-5 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm text-center"
+              className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm text-center"
             >
               {errors.form}
             </motion.div>
@@ -108,19 +108,19 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-5" autoComplete="on">
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-red-700 mb-2">Email Address</label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-red-500 group-focus-within:text-red-600 transition">
                 <FaUser size={18} />
               </div>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full pl-12 pr-4 py-3 rounded-xl bg-zinc-800 border-2 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 ${
+                className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border-2 text-gray-800 placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-100 ${
                   errors.email
                     ? "border-red-500 focus:border-red-500 shake"
-                    : "border-zinc-700 focus:border-red-500"
+                    : "border-red-200 focus:border-red-500"
                 }`}
                 placeholder="you@example.com"
                 aria-invalid={!!errors.email}
@@ -132,7 +132,7 @@ export default function Login() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-2 text-xs text-red-400 pl-1"
+                  className="mt-2 text-xs text-red-600 pl-1"
                 >
                   {errors.email}
                 </motion.p>
@@ -142,19 +142,19 @@ export default function Login() {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <label className="block text-sm font-medium text-red-700 mb-2">Password</label>
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-red-500 group-focus-within:text-red-600 transition">
                 <FaLock size={18} />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full pl-12 pr-12 py-3 rounded-xl bg-zinc-800 border-2 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 ${
+                className={`w-full pl-12 pr-12 py-3 rounded-xl bg-white border-2 text-gray-800 placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-100 ${
                   errors.password
                     ? "border-red-500 focus:border-red-500 shake"
-                    : "border-zinc-700 focus:border-red-500"
+                    : "border-red-200 focus:border-red-500"
                 }`}
                 placeholder="••••••••"
                 autoComplete="current-password"
@@ -163,7 +163,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="cursor-pointer absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-red-500 transition"
+                className="cursor-pointer absolute inset-y-0 right-0 pr-4 flex items-center text-red-500 hover:text-red-600 transition"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
@@ -175,7 +175,7 @@ export default function Login() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-2 text-xs text-red-400 pl-1"
+                  className="mt-2 text-xs text-red-600 pl-1"
                 >
                   {errors.password}
                 </motion.p>
@@ -191,8 +191,8 @@ export default function Login() {
             disabled={loading}
             className={`cursor-pointer w-full py-3.5 rounded-xl font-bold text-white transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${
               loading
-                ? "bg-red-700 cursor-not-allowed opacity-80"
-                : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-600/30"
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
             }`}
           >
             {loading ? (
@@ -210,8 +210,7 @@ export default function Login() {
           </motion.button>
         </form>
 
-        {/* Footer Links */}
-        
+   
       </motion.div>
 
       {/* Shake Animation */}
