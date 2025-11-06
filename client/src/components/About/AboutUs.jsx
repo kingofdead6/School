@@ -21,7 +21,6 @@ export default function AboutUs() {
               transition={{ duration: 0.5, type: "spring", stiffness: 120 }}
               className="text-5xl md:text-7xl font-extrabold text-red-600 flex items-center justify-center gap-3"
             >
-              <FaGraduationCap className="w-16 h-16 animate-pulse" />
               About Us
             </motion.h1>
             <motion.p

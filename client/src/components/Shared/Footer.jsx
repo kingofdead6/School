@@ -41,7 +41,7 @@ export default function Footer() {
       setSuccess("Subscribed successfully! Welcome to our community.");
       setEmail("");
       setError("");
-      setTimeout(() => setSuccess(""), 5000); // Auto-clear
+      setTimeout(() => setSuccess(""), 5000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to subscribe. Try again.");
       setSuccess("");
@@ -56,7 +56,6 @@ export default function Footer() {
     { label: "Home", path: "/", icon: <FaHome /> },
     { label: "About Us", path: "/about-us", icon: <FaInfoCircle /> },
     { label: "Registration", path: "/registration", icon: <FaUserShield /> },
-    { label: "Contact", path: "/contact", icon: <FaEnvelopeOpenText /> },
   ];
 
   const containerVariants = {
@@ -73,11 +72,11 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-t from-gray-900 to-gray-800 text-white py-16 px-4 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-red-600 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-700 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+    <footer className="bg-gradient-to-t from-red-50 to-white text-gray-800 py-16 px-4 relative overflow-hidden">
+      {/* Subtle Red Glows */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-red-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-600 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
       </div>
 
       <motion.div
@@ -93,15 +92,15 @@ export default function Footer() {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-3 mb-5"
           >
-            <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+            <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-red-300">
               E
             </div>
             <h3 className="text-2xl font-extrabold tracking-tight">
-              <span className="text-red-500">Edu</span>
-              <span className="text-white">Center</span>
+              <span className="text-red-600">Edu</span>
+              <span className="text-gray-800">Center</span>
             </h3>
           </motion.div>
-          <p className="text-gray-300 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed">
             Empowering the next generation with quality education, modern tools, and a supportive learning environment.
           </p>
           <div className="flex gap-3 mt-6">
@@ -111,7 +110,7 @@ export default function Footer() {
                 href="#"
                 whileHover={{ scale: 1.2, rotate: 360 }}
                 whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition"
+                className="cursor-pointer w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 hover:bg-red-600 hover:text-white transition shadow-md"
               >
                 <Icon size={18} />
               </motion.a>
@@ -121,7 +120,7 @@ export default function Footer() {
 
         {/* Quick Links */}
         <motion.div variants={itemVariants}>
-          <h3 className="text-xl font-bold text-red-500 mb-5">Quick Links</h3>
+          <h3 className="text-xl font-bold text-red-700 mb-5">Quick Links</h3>
           <ul className="space-y-3">
             {quickLinks.map((link, i) => (
               <motion.li
@@ -129,10 +128,10 @@ export default function Footer() {
                 whileHover={{ x: 5 }}
                 className="flex items-center gap-3"
               >
-                <span className="text-red-500">{link.icon}</span>
+                <span className="text-red-600">{link.icon}</span>
                 <a
                   href={link.path}
-                  className="text-gray-300 hover:text-red-400 transition font-medium"
+                  className="text-gray-700 hover:text-red-600 transition font-medium"
                 >
                   {link.label}
                 </a>
@@ -143,18 +142,18 @@ export default function Footer() {
 
         {/* Contact Info */}
         <motion.div variants={itemVariants}>
-          <h3 className="text-xl font-bold text-red-500 mb-5">Contact Us</h3>
-          <ul className="space-y-4 text-gray-300">
+          <h3 className="text-xl font-bold text-red-700 mb-5">Contact Us</h3>
+          <ul className="space-y-4 text-gray-700">
             <motion.li whileHover={{ x: 5 }} className="flex items-center gap-3">
-              <FaMapMarkerAlt className="text-red-500" />
+              <FaMapMarkerAlt className="text-red-600" />
               <span>123 Education St, Algiers, Algeria</span>
             </motion.li>
             <motion.li whileHover={{ x: 5 }} className="flex items-center gap-3">
-              <FaPhone className="text-red-500" />
+              <FaPhone className="text-red-600" />
               <span>+213 555 123 456</span>
             </motion.li>
             <motion.li whileHover={{ x: 5 }} className="flex items-center gap-3">
-              <FaEnvelope className="text-red-500" />
+              <FaEnvelope className="text-red-600" />
               <span>contact@educenter.dz</span>
             </motion.li>
           </ul>
@@ -162,7 +161,7 @@ export default function Footer() {
 
         {/* Newsletter */}
         <motion.div variants={itemVariants}>
-          <h3 className="text-xl font-bold text-red-500 mb-5">Stay Updated</h3>
+          <h3 className="text-xl font-bold text-red-700 mb-5">Stay Updated</h3>
           <form onSubmit={handleSubscribe} className="space-y-4">
             <div className="relative">
               <input
@@ -170,12 +169,12 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className={`w-full p-4 pl-12 rounded-xl bg-gray-800 border-2 transition-all duration-300 text-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-red-500/30 ${
-                  error ? "border-red-500 shake" : "border-gray-600"
+                className={`w-full p-4 pl-12 rounded-xl bg-white border-2 transition-all duration-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-red-100 ${
+                  error ? "border-red-500 shake" : "border-red-200 focus:border-red-500"
                 }`}
                 disabled={loading}
               />
-              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-red-400" size={20} />
+              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500" size={20} />
             </div>
 
             <AnimatePresence>
@@ -184,7 +183,7 @@ export default function Footer() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-red-400 text-sm font-medium"
+                  className="text-red-600 text-sm font-medium"
                 >
                   {error}
                 </motion.p>
@@ -194,7 +193,7 @@ export default function Footer() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="text-green-400 text-sm font-medium flex items-center gap-2"
+                  className="text-green-600 text-sm font-medium flex items-center gap-2"
                 >
                   <motion.span
                     animate={{ scale: [1, 1.3, 1] }}
@@ -211,10 +210,10 @@ export default function Footer() {
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={loading}
-              className={`cursor-pointer w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold transition-all duration-300 shadow-lg ${
+              className={`cursor-pointer w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-white transition-all duration-300 shadow-lg ${
                 loading
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-300"
               }`}
             >
               {loading ? (
@@ -242,10 +241,10 @@ export default function Footer() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400"
+        className="mt-12 pt-8 border-t border-red-100 text-center text-gray-600"
       >
         <p className="text-sm">
-          © {currentYear} <span className="text-red-500 font-semibold">EduCenter</span>. All rights reserved.
+          © {currentYear} <span className="text-red-600 font-semibold">EduCenter</span>. All rights reserved.
         </p>
         <p className="text-xs mt-2">Crafted with passion for education</p>
       </motion.div>

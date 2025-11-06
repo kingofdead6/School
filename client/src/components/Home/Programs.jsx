@@ -1,34 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaSearch, FaBook, FaTimes } from "react-icons/fa";
+import { FaSearch, FaBook, FaTimes, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { API_BASE_URL } from "../../../api";
 
-const NextArrow = ({ onClick }) => (
-  <motion.button
+const CustomPrevArrow = ({ onClick }) => (
+  <button
     onClick={onClick}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="cursor-pointer absolute -right-3 top-1/2 z-20 -translate-y-1/2 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700"
-    aria-label="Next"
+    className="absolute left-2 top-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg z-20 transition-transform hover:scale-105"
   >
-    →
-  </motion.button>
+    <FaArrowLeft />
+  </button>
 );
 
-const PrevArrow = ({ onClick }) => (
-  <motion.button
+const CustomNextArrow = ({ onClick }) => (
+  <button
     onClick={onClick}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="cursor-pointer absolute -left-3 top-1/2 z-20 -translate-y-1/2 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700"
-    aria-label="Previous"
+    className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg z-20 transition-transform hover:scale-105"
   >
-    ←
-  </motion.button>
+    <FaArrowRight />
+  </button>
 );
 
 const Programs = () => {
@@ -38,8 +32,34 @@ const Programs = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null); // 👈 for fullscreen image
+  const [selectedImage, setSelectedImage] = useState(null);
   const sliderRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const filteredPrograms = programs.filter((program) => {
+    let matchesSearch = true;
+    let matchesGrade = true;
+
+    if (searchQuery) {
+      const queryLower = searchQuery.trim().toLowerCase();
+      matchesSearch =
+        (program.name || "").toLowerCase().includes(queryLower) ||
+        (program.yearLevel?.name || "").toLowerCase().includes(queryLower);
+    }
+
+    if (selectedGrade) {
+      matchesGrade = program.yearLevel?._id?.toString() === selectedGrade;
+    }
+
+    return matchesSearch && matchesGrade;
+  });
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -69,40 +89,50 @@ const Programs = () => {
     fetchAll();
   }, []);
 
-  const filteredPrograms = programs.filter((program) => {
-    let matchesSearch = true;
-    let matchesGrade = true;
-
-    if (searchQuery) {
-      const queryLower = searchQuery.trim().toLowerCase();
-      matchesSearch =
-        (program.name || "").toLowerCase().includes(queryLower) ||
-        (program.yearLevel?.name || "").toLowerCase().includes(queryLower);
+  useEffect(() => {
+    if (!loading && filteredPrograms.length) {
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+        sliderRef.current?.slickGoTo(0);
+      }, 100);
     }
+  }, [loading, filteredPrograms.length]);
 
-    if (selectedGrade) {
-      matchesGrade =
-        program.yearLevel?._id?.toString() === selectedGrade;
-    }
+const desktopSettings = {
+  dots: false,
+  infinite: filteredPrograms.length > 4,
+  speed: 600,
+  slidesToShow: Math.min(4, Math.max(1, filteredPrograms.length)),
+  slidesToScroll: 1,
+  autoplay: true,             // ✅ enables auto scrolling
+  autoplaySpeed: 2500,        // ✅ 2.5 seconds per slide
+  pauseOnHover: true,         // ✅ pauses when user hovers
+  nextArrow: <CustomNextArrow />,
+  prevArrow: <CustomPrevArrow />,
+  responsive: [
+    { breakpoint: 1100, settings: { slidesToShow: 3 } },
+    { breakpoint: 700, settings: { slidesToShow: 2 } },
+    { breakpoint: 500, settings: { slidesToShow: 1 } },
+  ],
+  adaptiveHeight: true,
+  centerMode: false,
+};
 
-    return matchesSearch && matchesGrade;
-  });
+const mobileSettings = {
+  dots: true,
+  infinite: filteredPrograms.length > 1,
+  speed: 600,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,             // ✅ same for mobile
+  autoplaySpeed: 2000,
+  arrows: false,
+  centerMode: false,
+  swipeToSlide: true,
+  pauseOnHover: false,
+  adaptiveHeight: true,
+};
 
-  const sliderSettings = {
-    dots: false,
-    infinite: filteredPrograms.length > 4,
-    speed: 600,
-    slidesToShow: Math.min(4, Math.max(1, filteredPrograms.length)),
-    slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    responsive: [
-      { breakpoint: 1100, settings: { slidesToShow: Math.min(2, filteredPrograms.length) } },
-      { breakpoint: 700, settings: { slidesToShow: 1 } },
-    ],
-    adaptiveHeight: true,
-    centerMode: false,
-  };
 
   if (loading) {
     return (
@@ -118,16 +148,15 @@ const Programs = () => {
 
   return (
     <>
-      {/* Header + Filters */}
-      <div className="w-full max-w-7xl mx-auto px-4 py-12 bg-white overflow-x-hidden">
+      <div className="w-full mx-auto px-4 py-12 bg-white overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl font-bold text-red-600 flex items-center justify-center gap-3">
-            <FaBook size={36} />
+          <h2 className="text-3xl md:text-4xl font-bold text-red-600 flex items-center justify-center gap-3">
+            <FaBook size={30} className="hidden md:inline-block" />
             Our Academic Programs
           </h2>
           <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
@@ -135,8 +164,8 @@ const Programs = () => {
           </p>
         </motion.div>
 
-        <div className="bg-red-50 rounded-xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row gap-4">
-          <div className="w-full sm:w-1/3">
+        <div className="bg-red-50 rounded-xl shadow-sm p-6 mb-8 flex flex-col md:flex-row gap-4">
+          <div className="w-full md:w-1/3">
             <label className="block text-red-700 font-medium mb-2">Year Level</label>
             <select
               value={selectedGrade}
@@ -152,7 +181,7 @@ const Programs = () => {
             </select>
           </div>
 
-          <div className="w-full sm:w-1/3">
+          <div className="w-full md:w-1/3">
             <label className="block text-red-700 font-medium mb-2">Search by Name</label>
             <div className="relative">
               <input
@@ -168,60 +197,56 @@ const Programs = () => {
         </div>
       </div>
 
-      {/* Programs Slider */}
-      <div
-        style={{
-          position: "relative",
-          left: "50%",
-          right: "50%",
-          marginLeft: "-50vw",
-          marginRight: "-50vw",
-          width: "100vw",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-          boxSizing: "border-box",
-          background: "transparent",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
+      <div className="w-full md:w-7xl ml-0 md:-ml-35 overflow-hidden px-2 md:px-10">
+        <div className="w-full">
           {filteredPrograms.length === 0 ? (
             <div className="w-full text-center text-gray-600 py-10 bg-white">
               No programs found matching your criteria.
             </div>
           ) : (
-            <div className="relative">
-              <Slider ref={sliderRef} {...sliderSettings}>
-                {filteredPrograms.map((program) => (
-                  <div key={program._id} className="px-3">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.25 }}
-                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
-                      onClick={() => setSelectedImage(program.image || "https://via.placeholder.com/300x200?text=No+Image")}
-                    >
-                      <div className="relative">
-                        <img
-                          src={program.image || "https://via.placeholder.com/300x200?text=No+Image"}
-                          alt={program.name}
-                          className="w-full h-80 object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "https://via.placeholder.com/300x200?text=No+Image";
-                          }}
-                        />
-                        <div className="absolute top-0 right-0 bg-red-600 text-white px-3 py-1 rounded-bl-lg text-sm font-medium">
-                          {program.yearLevel?.name || "N/A"}
-                        </div>
+            <Slider
+              key={isMobile ? "mobile" : "desktop"}
+              ref={sliderRef}
+              {...(isMobile ? mobileSettings : desktopSettings)}
+              className="!m-0 !p-0"
+            >
+              {filteredPrograms.map((program) => (
+                <div key={program._id} className="px-3">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+                    onClick={() =>
+                      setSelectedImage(
+                        program.image || "https://via.placeholder.com/300x200?text=No+Image"
+                      )
+                    }
+                  >
+                    <div className="relative">
+                      <img
+                        src={
+                          program.image ||
+                          "https://via.placeholder.com/300x200?text=No+Image"
+                        }
+                        alt={program.name}
+                        className="w-full h-72 sm:h-80 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://via.placeholder.com/300x200?text=No+Image";
+                        }}
+                      />
+                      <div className="absolute top-0 right-0 bg-red-600 text-white px-3 py-1 rounded-bl-lg text-sm font-medium">
+                        {program.yearLevel?.name || "N/A"}
                       </div>
-                    </motion.div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
+                    </div>
+                  </motion.div>
+                </div>
+              ))}
+            </Slider>
           )}
         </div>
       </div>
 
-      {/* Fullscreen Image Modal */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div

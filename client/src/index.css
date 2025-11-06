@@ -8,3 +8,10 @@ body {
   background-color: #ffffff; 
 }
 
+.slick-list {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.slick-track {
+  margin-left: 0 !important;
+}
