@@ -599,7 +599,7 @@ function EditProfileModal({ user, formData, setFormData, formErrors, loading, su
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
+              className="cursor-pointer flex-1 px-6 py-3 rounded-xl font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 transition"
             >
               Cancel
             </motion.button>
