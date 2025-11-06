@@ -6,7 +6,7 @@ const testimonialSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true, maxLength: 100 },
     text: { type: String, required: true, trim: true, maxLength: 500 },
     stars: { type: Number, required: true, min: 1, max: 5 },
-    image: { type: String, default: null }, // Optional Cloudinary URL
+    image: { type: String, default: null }, 
   },
   { timestamps: true }
 );

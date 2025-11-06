@@ -25,6 +25,7 @@ import AdminPrograms from "./components/Admin/AdminPrograms";
 import SubmitTestimonialPage from "./components/Home/SubmitTestimonial";
 import AdminTestimonials from "./components/Admin/AdminTestimonials";
 import StudentRegistrationForm from "./components/Registration/StudentRegistrationForm";
+import Navbar from "./components/Shared/Navbar";
 
 
 export default function App() {
@@ -32,12 +33,12 @@ export default function App() {
   return (
     <Router>
        <ScrollToTop />
-        
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/teacher/:id" element={<TeacherProfiles />} />
           <Route path="/reviews" element={<SubmitTestimonialPage /> } />
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about-us" element={<AboutPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<StudentRegistrationForm />} />
             <Route element={<ProtectedRoute />}>

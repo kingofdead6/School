@@ -13,7 +13,7 @@ const registrationSchema = new mongoose.Schema({
   },
   group: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Group', // Reference to specific group
+    ref: 'Group', 
     required: true,
   },
   status: {

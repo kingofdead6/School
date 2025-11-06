@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
 import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../../api";
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,35 +30,25 @@ export default function Login() {
     if (Object.keys(validationErrors).length === 0) {
       setLoading(true);
       try {
-        // Try User login first
         let response = await axios.post(`${API_BASE_URL}/users/login`, { email, password });
         const { token, user } = response.data;
 
-        // Store token
         localStorage.setItem("token", token);
-
-        // Dispatch auth event
         window.dispatchEvent(new Event("authChanged"));
 
-        // Redirect based on role
         if (user.role === "superadmin" || user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
           setErrors({ form: "Unauthorized role" });
         }
       } catch (err) {
-        // If User login fails, try Teacher login
         try {
           const response = await axios.post(`${API_BASE_URL}/teachers/login`, { email, password });
           const { token, user } = response.data;
 
-          // Store token
           localStorage.setItem("token", token);
-
-          // Dispatch auth event
           window.dispatchEvent(new Event("authChanged"));
 
-          // Redirect for teacher
           if (user.role === "teacher") {
             navigate("/teacher/dashboard");
           } else {
@@ -73,101 +64,167 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-zinc-900 via-black to-zinc-900">
       <motion.div
-        initial={{ y: -10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md bg-black/70 backdrop-blur-md border border-red-700 rounded-2xl p-6 shadow-xl"
+        initial={{ y: 30, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
+        className="w-full max-w-md bg-zinc-900/95 backdrop-blur-xl border border-red-800/50 rounded-2xl p-8 shadow-2xl shadow-red-900/20"
       >
-        <div className="text-center mb-6">
-          <div className="mx-auto w-20 h-20 rounded-full bg-red-600 flex items-center justify-center text-black text-2xl font-bold shadow-[0_0_10px_red]">
-            <img
-              src="https://res.cloudinary.com/dtwa3lxdk/image/upload/v1756897359/465660711_1763361547537323_2674934284076407223_n_prlt48.jpg"
-              alt="Logo"
-              className="rounded-full"
-            />
-          </div>
-          <h1 className="mt-4 text-2xl font-bold text-white">Login</h1>
-          <p className="mt-2 text-sm text-gray-300">Enter your credentials to continue</p>
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-red-700 p-1 shadow-lg shadow-red-600/50"
+          >
+            <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+                E
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        {errors.form && (
-          <div className="mb-4 text-sm text-red-400 text-center">{errors.form}</div>
-        )}
+        {/* Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+          <p className="mt-2 text-sm text-gray-400">Sign in to your account</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
+        {/* Form Error */}
+        <AnimatePresence>
+          {errors.form && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-5 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm text-center"
+            >
+              {errors.form}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="on">
           {/* Email */}
           <div>
-            <label className="block text-sm text-gray-200 mb-2">Email</label>
-            <div className="relative">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-                <FaUser />
+            <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition">
+                <FaUser size={18} />
               </div>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full pr-4 pl-10 py-3 rounded-lg bg-gray-800 border ${
-                  errors.email ? "border-red-500" : "border-red-700"
-                } text-white outline-none focus:border-red-600`}
-                placeholder="example@mail.com"
+                className={`w-full pl-12 pr-4 py-3 rounded-xl bg-zinc-800 border-2 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 shake"
+                    : "border-zinc-700 focus:border-red-500"
+                }`}
+                placeholder="you@example.com"
                 aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
               />
-              
             </div>
-            {errors.email && (
-              <p id="email-error" className="mt-2 text-xs text-red-400">{errors.email}</p>
-            )}
+            <AnimatePresence>
+              {errors.email && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 text-xs text-red-400 pl-1"
+                >
+                  {errors.email}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm text-gray-200 mb-2">Password</label>
-            <div className="relative">
-                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 hover:text-red-400">
-                <FaLock />
+            <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-red-500 transition">
+                <FaLock size={18} />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 border ${
-                  errors.password ? "border-red-500" : "border-red-700"
-                } text-white outline-none focus:border-red-600`}
-                placeholder="Enter your password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
+                className={`w-full pl-12 pr-12 py-3 rounded-xl bg-zinc-800 border-2 text-white placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 ${
+                  errors.password
+                    ? "border-red-500 focus:border-red-500 shake"
+                    : "border-zinc-700 focus:border-red-500"
+                }`}
+                placeholder="••••••••"
                 autoComplete="current-password"
+                aria-invalid={!!errors.password}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="cursor-pointer absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-red-400"
+                className="cursor-pointer absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-red-500 transition"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
               </button>
-              
             </div>
-            {errors.password && (
-              <p id="password-error" className="mt-2 text-xs text-red-400">{errors.password}</p>
-            )}
+            <AnimatePresence>
+              {errors.password && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 text-xs text-red-400 pl-1"
+                >
+                  {errors.password}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Submit */}
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="cursor-pointer w-full py-3 rounded-lg bg-red-600 text-black font-bold hover:bg-red-500 transition disabled:opacity-60"
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </div>
+          {/* Submit Button */}
+          <motion.button
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
+            type="submit"
+            disabled={loading}
+            className={`cursor-pointer w-full py-3.5 rounded-xl font-bold text-white transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${
+              loading
+                ? "bg-red-700 cursor-not-allowed opacity-80"
+                : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-600/30"
+            }`}
+          >
+            {loading ? (
+              <>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                />
+                Logging in...
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </motion.button>
         </form>
+
+        {/* Footer Links */}
+        
       </motion.div>
+
+      {/* Shake Animation */}
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
